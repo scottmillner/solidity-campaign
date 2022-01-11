@@ -10,6 +10,13 @@
 			"name": "Compile",
 			"skipFiles": ["<node_internals>/**"],
 			"program": "${workspaceFolder}\\src\\ethereum\\compile.js"
+		},
+		{
+			"name": "Mocha Tests",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceFolder}\\src\\ethereum",
+			"runtimeExecutable": "mocha"
 		}
 	]
 }

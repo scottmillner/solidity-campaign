@@ -15,12 +15,11 @@ contract CloneFactory {
         baseImplementation = address(new Campaign());
     }
 
-    function createCampaign(uint40 _minimum, address _creator) external returns(address) {
+    function createCampaign(uint40 _minimum, address _creator) external {
         address _newCampaign = Clones.clone(baseImplementation);
         Campaign(_newCampaign).initialize(_minimum, _creator);
         campaignContracts.push(_newCampaign);
         emit CampaignCreated(_newCampaign);
-        return _newCampaign;
     }
 
     function getCampaigns() public view returns(address[] memory) {
