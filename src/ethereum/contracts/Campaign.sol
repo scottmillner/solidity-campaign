@@ -45,8 +45,8 @@ contract Campaign is Initializable {
 
     function approveRequest(uint index) external {
         Request storage request = requests[index];
-        require(approvers[msg.sender], "You must be approved to make this request");
-        require(!request.approvals[msg.sender], "You are not allowed to approve this request");
+        require(approvers[msg.sender], "You must be approved to make this request.");
+        require(!request.approvals[msg.sender], "You have already approved this request.");
         request.approvals[msg.sender] = true;
         request.approvalCount++;
     }
