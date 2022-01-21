@@ -1,6 +1,6 @@
-export const App: React.FC = () => {
-	return <div>Howdy There!!</div>;
-};
+import { Main } from './components/Main';
+
+export const App: React.FC = () => <Main />;
 
 App.displayName = 'App';
 App.whyDidYouRender = false;

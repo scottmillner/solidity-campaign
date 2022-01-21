@@ -2,11 +2,30 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { App } from './App';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from 'react-router-dom';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import { ErrorPage } from './components/ui/ErrorPage';
 import './index.css';
+
+// error handling logic
+// display <ErrorPage /> with error message
+const ErrorFallback: React.ComponentType<FallbackProps> = ({ error, resetErrorBoundary }) => {
+	return <ErrorPage error={error} />;
+};
+
+// add reset logic if needed
+const onResetHandler: () => void = () => {};
+
+// log to local filestore or localStorage if needed
+const errorHandler: (error: Error, info: { componentStack: string }) => void = (error, info) => {};
 
 ReactDOM.render(
 	<React.StrictMode>
-		<App />
+		<BrowserRouter>
+			<ErrorBoundary fallbackRender={ErrorFallback} onReset={onResetHandler} onError={errorHandler}>
+				<App />
+			</ErrorBoundary>
+		</BrowserRouter>
 	</React.StrictMode>,
 	document.getElementById('root')
 );
