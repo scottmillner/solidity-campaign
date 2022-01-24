@@ -11,6 +11,8 @@ import { Alert } from './ui/Alert';
 import { Dialog, Transition } from '@headlessui/react';
 import { Link, Route, Routes } from 'react-router-dom';
 import { Spinner } from './ui/Spinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHouseUser } from '@fortawesome/free-solid-svg-icons';
 
 interface Navigation {
 	name: string;
@@ -33,7 +35,8 @@ export const Main: React.FC = () => {
 	const userAccount = accounts && accounts[0];
 	const isCorrectNetwork = ethereum?.networkVersion === '3';
 
-	const navigation: Navigation[] = [{ name: 'home', to: PathName.Home, icon: <div>HOME</div>, current: pathName === PathName.Home }];
+	const homeIcon = <FontAwesomeIcon icon={faHouseUser} size='2x' color='#11B4BF' />;
+	const navigation: Navigation[] = [{ name: 'home', to: PathName.Home, icon: homeIcon, current: pathName === PathName.Home }];
 
 	const onboarding = new MetaMaskOnboarding();
 	const connectWallet: () => void = async () => {
@@ -78,7 +81,7 @@ export const Main: React.FC = () => {
 
 	// Content setup
 	const ActionButton: JSX.Element = (
-		<button type='button' className='btn-wallet w-60 h-12 mt-4 mb-20 rounded-5 bg-lumerin-aqua text-sm font-Inter' onClick={connectClickHander}>
+		<button type='button' className='btn-wallet w-60 h-12 rounded-5 bg-aqua text-sm font-Inter' onClick={connectClickHander}>
 			<span className='mr-4'>Connect Via MetaMask</span>
 			<MetaMaskIcon />
 		</button>
@@ -98,9 +101,15 @@ export const Main: React.FC = () => {
 		return routes;
 	};
 
+	const getAlertMessage: () => string = () => {
+		if (!isCorrectNetwork) return AlertMessage.WrongNetwork;
+		if (!isConnected) return AlertMessage.NotConnected;
+		return AlertMessage.NotConnected;
+	};
+
 	return (
 		<div id='main' className='h-screen flex overflow-hidden font-Inter'>
-			<Alert message={isConnected ? AlertMessage.WrongNetwork : AlertMessage.NotConnected} open={alertOpen} setOpen={setAlertOpen} />
+			<Alert message={getAlertMessage()} open={alertOpen} setOpen={setAlertOpen} />
 			{/* collapsable sidebar: below lg breakpoint */}
 			<Transition.Root show={sidebarOpen} as={Fragment}>
 				<Dialog as='div' static className='fixed inset-0 flex z-40 lg:hidden' open={sidebarOpen} onClose={setSidebarOpen}>
@@ -141,7 +150,7 @@ export const Main: React.FC = () => {
 										onClick={() => setSidebarOpen(false)}
 									>
 										<span className='sr-only'>Close sidebar</span>
-										<XIcon className='h-6 w-6 text-white' aria-hidden='true' />
+										<XIcon className='h-6 w-6 text-aqua' aria-hidden='true' />
 									</button>
 								</div>
 							</Transition.Child>
@@ -157,7 +166,7 @@ export const Main: React.FC = () => {
 											)}
 											onClick={() => setToggle(!toggle)}
 										>
-											<div>
+											<div className='flex items-baseline gap-2'>
 												<div>{item.icon}</div>
 												<span>{item.name}</span>
 											</div>
@@ -192,7 +201,7 @@ export const Main: React.FC = () => {
 										)}
 										onClick={() => setToggle(!toggle)}
 									>
-										<div>
+										<div className='flex items-baseline gap-2'>
 											<div>{item.icon}</div>
 											<span>{item.name}</span>
 										</div>
@@ -229,7 +238,12 @@ export const Main: React.FC = () => {
 						) : null}
 					</div>
 				</div>
-				<main className={classNames(!isConnected ? 'mt-0' : 'mr-0 lg:mr-48', 'mt-10 flex-1 relative overflow-y-auto focus:outline-none')}>
+				<main
+					className={classNames(
+						isConnected ? 'mr-0 lg:mr-48' : 'm-auto',
+						'flex justify-center relative overflow-y-auto focus:outline-none'
+					)}
+				>
 					{getContent()}
 				</main>
 			</div>

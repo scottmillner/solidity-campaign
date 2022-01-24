@@ -34,6 +34,19 @@
 			"request": "launch",
 			"skipFiles": ["<node_internals>/**"],
 			"type": "pwa-node"
+		},
+		{
+			"name": "CRA Tests",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-app-rewired",
+			"args": ["test", "--runInBand", "--no-cache", "--watchAll=false"],
+			"cwd": "${workspaceFolder}",
+			"protocol": "inspector",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"env": { "CI": "true" },
+			"disableOptimisticBPs": true
 		}
 	]
 }
