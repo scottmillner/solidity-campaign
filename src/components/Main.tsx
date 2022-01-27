@@ -1,4 +1,4 @@
-import { Fragment, Suspense, useState } from 'react';
+import { Fragment, Suspense, useEffect, useState } from 'react';
 import { MetaMaskIcon } from '../images/index';
 import MetaMaskOnboarding from '@metamask/onboarding';
 import { getWeb3ResultAsync, reconnectWalletAsync } from '../web3';
@@ -13,6 +13,8 @@ import { Link, Route, Routes } from 'react-router-dom';
 import { Spinner } from './ui/Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouseUser } from '@fortawesome/free-solid-svg-icons';
+import { Campaigns } from './Campaigns';
+import { useInterval } from './hooks/useInterval';
 
 interface Navigation {
 	name: string;
@@ -42,6 +44,7 @@ export const Main: React.FC = () => {
 	const connectWallet: () => void = async () => {
 		const web3Result = await getWeb3ResultAsync(setAlertOpen);
 		if (web3Result) {
+			if (ethereum.networkVersion !== '3') setAlertOpen(true);
 			const { accounts, contractInstance, web3 } = web3Result;
 			setAccounts(accounts);
 			setCloneFactory(contractInstance);
@@ -49,6 +52,22 @@ export const Main: React.FC = () => {
 			setIsConnected(true);
 		}
 	};
+
+	const addCampaignsAsync: (addresses: string[]) => void = (addresses) => {};
+
+	const createCampaignsAsync: () => void = async () => {
+		const campaigns = await cloneFactory?.methods.getCampaigns().call();
+		if (campaigns) addCampaignsAsync(campaigns);
+	};
+
+	useEffect(() => {
+		if (isCorrectNetwork) createCampaignsAsync();
+	}, [cloneFactory, accounts, web3]);
+
+	// Get campaigns every 30 seconds
+	useInterval(() => {
+		createCampaignsAsync();
+	}, 30000);
 
 	const connectClickHander: React.MouseEventHandler<HTMLButtonElement> = async (event) => {
 		// Onboard metamask if not installed
@@ -90,7 +109,7 @@ export const Main: React.FC = () => {
 	const routes = (
 		<Suspense fallback={<Spinner />}>
 			<Routes>
-				<Route path={PathName.Home} element={<div>HOME</div>} />
+				<Route path={PathName.Home} element={<Campaigns />} />
 			</Routes>
 		</Suspense>
 	);
@@ -107,9 +126,19 @@ export const Main: React.FC = () => {
 		return AlertMessage.NotConnected;
 	};
 
+	const changeNetworkAsync: () => void = async () => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const result = await ethereum.request({
+			method: 'wallet_switchEthereumChain',
+			params: [{ chainId: web3?.utils.toHex(3) }],
+		});
+		setAlertOpen(false);
+		connectWallet();
+	};
+
 	return (
 		<div id='main' className='h-screen flex overflow-hidden font-Inter'>
-			<Alert message={getAlertMessage()} open={alertOpen} setOpen={setAlertOpen} />
+			<Alert message={getAlertMessage()} open={alertOpen} setOpen={setAlertOpen} onClick={changeNetworkAsync} />
 			{/* collapsable sidebar: below lg breakpoint */}
 			<Transition.Root show={sidebarOpen} as={Fragment}>
 				<Dialog as='div' static className='fixed inset-0 flex z-40 lg:hidden' open={sidebarOpen} onClose={setSidebarOpen}>

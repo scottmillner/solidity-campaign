@@ -8,7 +8,7 @@ import { Ethereum, EthereumError } from './types';
 import CloneFactory from './ethereum/contracts/build/CloneFactory.json';
 
 const ethereum = window.ethereum as Ethereum;
-const cloneFactoryAddress = '0x93567dc781708F9D8C28BD0B64a76A7321950aDB';
+const cloneFactoryAddress = '0xB5a8Bb917c3143b10932468E86c94a1a072d55A2';
 
 type SetAlertOpen = React.Dispatch<React.SetStateAction<boolean>>;
 interface Web3Result {
@@ -20,7 +20,6 @@ interface Web3Result {
 export const getWeb3ResultAsync: (setAlertOpen: SetAlertOpen) => Promise<Web3Result | null> = async (setAlertOpen: SetAlertOpen) => {
 	const provider = (await detectEthereumProvider()) as provider;
 	if (provider && provider === ethereum) {
-		if (ethereum.networkVersion !== '3') setAlertOpen(true);
 		try {
 			// Expose accounts
 			await ethereum.request({ method: 'eth_requestAccounts' });
