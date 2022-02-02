@@ -7,6 +7,7 @@ module.exports = {
 			},
 			borderRadius: {
 				5: '5px',
+				15: '15px',
 			},
 			colors: {
 				gray: '#F2F5F9',

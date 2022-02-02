@@ -5,7 +5,7 @@ import { getWeb3ResultAsync, reconnectWalletAsync } from '../web3';
 import { Contract } from 'web3-eth-contract';
 import { MenuAlt2Icon, XIcon } from '@heroicons/react/outline';
 import Web3 from 'web3';
-import { classNames, truncateAddress } from '../utils';
+import { classNames, printError, truncateAddress } from '../utils';
 import { AddressLength, AlertMessage, Ethereum, PathName } from '../types';
 import { Alert } from './ui/Alert';
 import { Dialog, Transition } from '@headlessui/react';
@@ -14,7 +14,10 @@ import { Spinner } from './ui/Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouseUser } from '@fortawesome/free-solid-svg-icons';
 import { Campaigns } from './Campaigns';
+import Campaign from '../ethereum/contracts/build/Campaign.json';
+import { AbiItem } from 'web3-utils';
 import { useInterval } from './hooks/useInterval';
+import _ from 'lodash';
 
 interface Navigation {
 	name: string;
@@ -23,12 +26,18 @@ interface Navigation {
 	current: boolean;
 }
 
+interface Campaign {
+	address: string;
+	minimumContribution: number;
+}
+
 export const Main: React.FC = () => {
 	const [isConnected, setIsConnected] = useState<boolean>(false);
 	const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 	const [alertOpen, setAlertOpen] = useState<boolean>(false);
 	const [accounts, setAccounts] = useState<string[]>();
 	const [cloneFactory, setCloneFactory] = useState<Contract>();
+	const [campaigns, setCampaigns] = useState<Campaign[]>([]);
 	const [toggle, setToggle] = useState<boolean>(false);
 	const [pathName, setPathName] = useState<string>(window.location.pathname);
 	const [web3, setWeb3] = useState<Web3>();
@@ -53,11 +62,40 @@ export const Main: React.FC = () => {
 		}
 	};
 
-	const addCampaignsAsync: (addresses: string[]) => void = (addresses) => {};
+	const createCampaignAsync: (address: string) => Promise<Campaign | null> = async (address) => {
+		if (web3) {
+			const campaignContract = new web3.eth.Contract(Campaign.abi as AbiItem[], address);
+			const minimumContribution = await campaignContract.methods.minimumContribution().call();
+
+			return {
+				address,
+				minimumContribution,
+			};
+		}
+
+		return null;
+	};
+
+	const addCampaignsAsync: (addresses: string[]) => void = async (addresses) => {
+		const crowdCampaigns: Campaign[] = [];
+		for await (const address of addresses) {
+			const campaign = await createCampaignAsync(address);
+			if (campaign) crowdCampaigns.push(campaign);
+		}
+
+		// update campaigns if deep equality false
+		if (!_.isEqual(campaigns, crowdCampaigns)) setCampaigns(crowdCampaigns);
+	};
 
 	const createCampaignsAsync: () => void = async () => {
-		const campaigns = await cloneFactory?.methods.getCampaigns().call();
-		if (campaigns) addCampaignsAsync(campaigns);
+		try {
+			const addresses = await cloneFactory?.methods.getCampaigns().call();
+			if (addresses) addCampaignsAsync(addresses);
+		} catch (error) {
+			const typedError = error as Error;
+			printError(typedError.message, typedError.stack as string);
+			throw typedError;
+		}
 	};
 
 	useEffect(() => {
@@ -100,7 +138,7 @@ export const Main: React.FC = () => {
 
 	// Content setup
 	const ActionButton: JSX.Element = (
-		<button type='button' className='btn-wallet w-60 h-12 rounded-5 bg-aqua text-sm font-Inter' onClick={connectClickHander}>
+		<button type='button' className='btn-wallet w-60 h-12 bg-aqua text-sm font-Inter' onClick={connectClickHander}>
 			<span className='mr-4'>Connect Via MetaMask</span>
 			<MetaMaskIcon />
 		</button>

@@ -4,7 +4,7 @@
 
 @layer components {
 	.btn-wallet {
-		@apply flex items-center justify-center bg-white text-base font-medium text-white hover:text-indigo-50;
+		@apply flex items-center justify-center bg-white rounded-5 text-base font-medium text-white hover:text-indigo-50;
 	}
 
 	.btn-connected {
