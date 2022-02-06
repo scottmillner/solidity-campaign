@@ -6,7 +6,7 @@ import { Contract } from 'web3-eth-contract';
 import { MenuAlt2Icon, XIcon } from '@heroicons/react/outline';
 import Web3 from 'web3';
 import { classNames, printError, truncateAddress } from '../utils';
-import { AddressLength, AlertMessage, Ethereum, PathName } from '../types';
+import { AddressLength, AlertMessage, Campaign, Ethereum, PathName } from '../types';
 import { Alert } from './ui/Alert';
 import { Dialog, Transition } from '@headlessui/react';
 import { Link, Route, Routes } from 'react-router-dom';
@@ -14,7 +14,7 @@ import { Spinner } from './ui/Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouseUser } from '@fortawesome/free-solid-svg-icons';
 import { Campaigns } from './Campaigns';
-import Campaign from '../ethereum/contracts/build/Campaign.json';
+import CampaignContract from '../ethereum/contracts/build/Campaign.json';
 import { AbiItem } from 'web3-utils';
 import { useInterval } from './hooks/useInterval';
 import _ from 'lodash';
@@ -24,11 +24,6 @@ interface Navigation {
 	to: string;
 	icon?: JSX.Element;
 	current: boolean;
-}
-
-interface Campaign {
-	address: string;
-	minimumContribution: number;
 }
 
 export const Main: React.FC = () => {
@@ -64,7 +59,7 @@ export const Main: React.FC = () => {
 
 	const createCampaignAsync: (address: string) => Promise<Campaign | null> = async (address) => {
 		if (web3) {
-			const campaignContract = new web3.eth.Contract(Campaign.abi as AbiItem[], address);
+			const campaignContract = new web3.eth.Contract(CampaignContract.abi as AbiItem[], address);
 			const minimumContribution = await campaignContract.methods.minimumContribution().call();
 
 			return {
@@ -147,7 +142,7 @@ export const Main: React.FC = () => {
 	const routes = (
 		<Suspense fallback={<Spinner />}>
 			<Routes>
-				<Route path={PathName.Home} element={<Campaigns />} />
+				<Route path={PathName.Home} element={<Campaigns campaigns={campaigns} />} />
 			</Routes>
 		</Suspense>
 	);
@@ -293,22 +288,25 @@ export const Main: React.FC = () => {
 						<span className='sr-only'>Open sidebar</span>
 						<MenuAlt2Icon className='h-6 w-6' aria-hidden='true' />
 					</button>
-					<div className={!isConnected ? 'hidden' : 'flex items-center ml-4 xl:ml-0'}>
+					<div className={!isConnected ? 'hidden' : 'flex items-center ml-4 lg:ml-0'}>
 						<p className='text-lg text-lumerin-dark-aqua font-semibold'>{getPageTitle()}</p>
 					</div>
-					<div className={isConnected ? 'flex-1 px-4 flex justify-end' : 'hidden'}>
+					<div className={isConnected ? 'flex-1 pr-4' : 'hidden'}>
 						{isConnected ? (
-							<button className='btn-connected w-64 cursor-default'>
-								<span className='mr-4'>{getTruncatedWalletAddress()}</span>
-								<MetaMaskIcon />
-							</button>
+							<div className='flex w-full justify-between'>
+								<button className='btn-create'>Create Contract</button>
+								<button className='btn-connected w-64 cursor-default'>
+									<span className='mr-4'>{getTruncatedWalletAddress()}</span>
+									<MetaMaskIcon />
+								</button>
+							</div>
 						) : null}
 					</div>
 				</div>
 				<main
 					className={classNames(
-						isConnected ? 'mr-0 lg:mr-48' : 'm-auto',
-						'flex justify-center relative overflow-y-auto focus:outline-none'
+						isConnected ? 'mt-8 mr-0 lg:mr-48' : 'm-auto',
+						'flex justify-center lg:justify-start relative overflow-y-auto focus:outline-none'
 					)}
 				>
 					{getContent()}

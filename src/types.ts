@@ -26,3 +26,8 @@ export interface Ethereum extends HttpProvider {
 export interface EthereumError extends Error {
 	code: number;
 }
+
+export interface Campaign {
+	address: string;
+	minimumContribution: number;
+}

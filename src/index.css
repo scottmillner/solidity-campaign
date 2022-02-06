@@ -10,4 +10,8 @@
 	.btn-connected {
 		@apply w-40 h-12 mt-4 hidden sm:flex items-center justify-center rounded-5 py-2 px-4 bg-light-aqua text-sm text-black font-Inter font-medium;
 	}
+
+	.btn-create {
+		@apply h-12 mt-4 px-4 bg-black text-white rounded-5;
+	}
 }

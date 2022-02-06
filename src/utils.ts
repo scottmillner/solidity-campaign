@@ -26,6 +26,21 @@ export const classNames: (...classes: string[]) => string = (...classes) => {
 	return classes.filter(Boolean).join(' ');
 };
 
+export const setMediaQueryListOnChangeHandler: (
+	mediaQueryList: MediaQueryList,
+	isLargeBreakpointOrGreater: boolean,
+	setIsLargeBreakpointOrGreater: React.Dispatch<React.SetStateAction<boolean>>
+) => void = (mediaQueryList, isLargeBreakpointOrGreater, setIsLargeBreakpointOrGreater) => {
+	function mediaQueryListOnChangeHandler(this: MediaQueryList, event: MediaQueryListEvent): void {
+		if (this.matches && !isLargeBreakpointOrGreater) {
+			setIsLargeBreakpointOrGreater(true);
+		} else if (isLargeBreakpointOrGreater) {
+			setIsLargeBreakpointOrGreater(false);
+		}
+	}
+	if (mediaQueryList) mediaQueryList.onchange = mediaQueryListOnChangeHandler;
+};
+
 // ERROR LOGGING
 // Print error message and stacktrace
 export const printError: (message: string, stacktrace: string) => void = (message, stacktrace) => {
