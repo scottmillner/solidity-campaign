@@ -18,6 +18,8 @@ import CampaignContract from '../ethereum/contracts/build/Campaign.json';
 import { AbiItem } from 'web3-utils';
 import { useInterval } from './hooks/useInterval';
 import _ from 'lodash';
+import { Modal } from './ui/Modal';
+import { CreateForm } from './ui/CreateForm';
 
 interface Navigation {
 	name: string;
@@ -35,6 +37,7 @@ export const Main: React.FC = () => {
 	const [campaigns, setCampaigns] = useState<Campaign[]>([]);
 	const [toggle, setToggle] = useState<boolean>(false);
 	const [pathName, setPathName] = useState<string>(window.location.pathname);
+	const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
 	const [web3, setWeb3] = useState<Web3>();
 
 	const ethereum = window.ethereum as Ethereum;
@@ -42,7 +45,7 @@ export const Main: React.FC = () => {
 	const isCorrectNetwork = ethereum?.networkVersion === '3';
 
 	const homeIcon = <FontAwesomeIcon icon={faHouseUser} size='2x' color='#11B4BF' />;
-	const navigation: Navigation[] = [{ name: 'home', to: PathName.Home, icon: homeIcon, current: pathName === PathName.Home }];
+	const navigation: Navigation[] = [{ name: 'Home', to: PathName.Home, icon: homeIcon, current: pathName === PathName.Home }];
 
 	const onboarding = new MetaMaskOnboarding();
 	const connectWallet: () => void = async () => {
@@ -172,6 +175,7 @@ export const Main: React.FC = () => {
 	return (
 		<div id='main' className='h-screen flex overflow-hidden font-Inter'>
 			<Alert message={getAlertMessage()} open={alertOpen} setOpen={setAlertOpen} onClick={changeNetworkAsync} />
+			<Modal open={createModalOpen} setOpen={setCreateModalOpen} content={<CreateForm setOpen={setCreateModalOpen} />} />
 			{/* collapsable sidebar: below lg breakpoint */}
 			<Transition.Root show={sidebarOpen} as={Fragment}>
 				<Dialog as='div' static className='fixed inset-0 flex z-40 lg:hidden' open={sidebarOpen} onClose={setSidebarOpen}>
@@ -294,7 +298,9 @@ export const Main: React.FC = () => {
 					<div className={isConnected ? 'flex-1 pr-4' : 'hidden'}>
 						{isConnected ? (
 							<div className='flex w-full justify-between'>
-								<button className='btn-create'>Create Contract</button>
+								<button className='btn-create' onClick={() => setCreateModalOpen(true)}>
+									Create Contract
+								</button>
 								<button className='btn-connected w-64 cursor-default'>
 									<span className='mr-4'>{getTruncatedWalletAddress()}</span>
 									<MetaMaskIcon />
@@ -302,6 +308,17 @@ export const Main: React.FC = () => {
 							</div>
 						) : null}
 					</div>
+				</div>
+				<div className='pl-18 pr-4 lg:pl-0'>
+					{isConnected ? (
+						<div className='h-16 flex flex-col sm:flex-row justify-between items-center text-aqua sm:border border-black rounded-5'>
+							<div className='h-full flex items-center px-4 sm:border-r border-black'>CrowdCoin</div>
+							<div className='h-full flex items-center'>
+								<input className='text-center' placeholder='Search'></input>
+							</div>
+							<div className='h-full flex items-center sm:border-l border-black px-4'>Campaigns</div>
+						</div>
+					) : null}
 				</div>
 				<main
 					className={classNames(

@@ -5,12 +5,15 @@ module.exports = {
 			fontFamily: {
 				Inter: ['Inter', 'sans-serif'],
 			},
+			spacing: {
+				18: '4.5rem',
+			},
 			borderRadius: {
 				5: '5px',
 				15: '15px',
 			},
 			colors: {
-				gray: '#F2F5F9',
+				'base-gray': '#F2F5F9',
 				'dark-gray': '#DEE3EA',
 				'input-gray': '#EDEEF2',
 				'placeholder-gray': '#C4C4C4',
