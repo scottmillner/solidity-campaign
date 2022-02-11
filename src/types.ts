@@ -15,6 +15,13 @@ export enum AlertMessage {
 export enum PathName {
 	Home = '/',
 }
+export enum ContentState {
+	Create = 'CREATE',
+	Review = 'REVIEW',
+	Confirm = 'CONFIRM',
+	Pending = 'PENDING',
+	Complete = 'COMPLETE',
+}
 
 // Interfaces
 export interface Ethereum extends HttpProvider {

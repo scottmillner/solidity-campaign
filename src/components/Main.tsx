@@ -247,10 +247,6 @@ export const Main: React.FC = () => {
 					</div>
 				</Dialog>
 			</Transition.Root>
-			{/* <div className={!isConnected ? 'm-8' : 'hidden'}>
-				<LogoIcon />
-			</div> */}
-
 			{/* Static sidebar for desktop */}
 			<div className={!isConnected ? 'hidden' : 'hidden bg-white lg:flex lg:flex-shrink-0'}>
 				<div className='flex flex-col w-48'>
@@ -299,7 +295,7 @@ export const Main: React.FC = () => {
 						{isConnected ? (
 							<div className='flex w-full justify-between'>
 								<button className='btn-create' onClick={() => setCreateModalOpen(true)}>
-									Create Contract
+									Create Campaign
 								</button>
 								<button className='btn-connected w-64 cursor-default'>
 									<span className='mr-4'>{getTruncatedWalletAddress()}</span>
@@ -309,17 +305,17 @@ export const Main: React.FC = () => {
 						) : null}
 					</div>
 				</div>
-				<div className='pl-18 pr-4 lg:pl-0'>
+				{/* <div className='pl-18 pr-4 lg:pl-0'>
 					{isConnected ? (
 						<div className='h-16 flex flex-col sm:flex-row justify-between items-center text-aqua sm:border border-black rounded-5'>
 							<div className='h-full flex items-center px-4 sm:border-r border-black'>CrowdCoin</div>
-							<div className='h-full flex items-center'>
-								<input className='text-center' placeholder='Search'></input>
+							<div className='h-full w-full flex items-center'>
+								<input className='h-full w-full text-center' placeholder='Search'></input>
 							</div>
 							<div className='h-full flex items-center sm:border-l border-black px-4'>Campaigns</div>
 						</div>
 					) : null}
-				</div>
+				</div> */}
 				<main
 					className={classNames(
 						isConnected ? 'mt-8 mr-0 lg:mr-48' : 'm-auto',

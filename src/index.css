@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer components {
+	.btn-standard {
+		@apply w-40 h-12 mt-4 px-4 bg-aqua text-white rounded-5;
+	}
+
 	.btn-wallet {
 		@apply flex items-center justify-center bg-white rounded-5 text-base font-medium text-white hover:text-indigo-50;
 	}
@@ -13,5 +17,18 @@
 
 	.btn-create {
 		@apply h-12 mt-4 px-4 bg-black text-white rounded-5;
+	}
+
+	.modal-input-spacing {
+		@apply px-8 pt-8;
+	}
+
+	/* inputs */
+	.review-input {
+		@apply appearance-none block w-full px-3 py-2 placeholder-opacity-75 focus:outline-none focus:ring-aqua focus:border-indigo-500 sm:text-sm;
+	}
+
+	.review-no-errors {
+		@apply bg-input-gray placeholder-placeholder-gray border border-transparent rounded-5 shadow-sm;
 	}
 }
