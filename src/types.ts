@@ -38,3 +38,7 @@ export interface Campaign {
 	address: string;
 	minimumContribution: number;
 }
+
+export interface Receipt {
+	status: boolean;
+}

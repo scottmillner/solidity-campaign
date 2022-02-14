@@ -9,7 +9,7 @@ export const Campaigns: React.FC<CampaignsProps> = ({ campaigns }) => {
 	return (
 		<div className='flex flex-col gap-4'>
 			<p className='text-3xl font-medium'>Open Campaigns</p>
-			<div className='flex'>
+			<div className='flex gap-12'>
 				{campaigns.map((campaign) => {
 					return (
 						<div key={campaign.address}>

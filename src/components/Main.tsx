@@ -175,7 +175,11 @@ export const Main: React.FC = () => {
 	return (
 		<div id='main' className='h-screen flex overflow-hidden font-Inter'>
 			<Alert message={getAlertMessage()} open={alertOpen} setOpen={setAlertOpen} onClick={changeNetworkAsync} />
-			<Modal open={createModalOpen} setOpen={setCreateModalOpen} content={<CreateForm setOpen={setCreateModalOpen} />} />
+			<Modal
+				open={createModalOpen}
+				setOpen={setCreateModalOpen}
+				content={<CreateForm web3={web3} cloneFactoryContract={cloneFactory} userAccount={userAccount} setOpen={setCreateModalOpen} />}
+			/>
 			{/* collapsable sidebar: below lg breakpoint */}
 			<Transition.Root show={sidebarOpen} as={Fragment}>
 				<Dialog as='div' static className='fixed inset-0 flex z-40 lg:hidden' open={sidebarOpen} onClose={setSidebarOpen}>

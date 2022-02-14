@@ -19,6 +19,10 @@
 		@apply h-12 mt-4 px-4 bg-black text-white rounded-5;
 	}
 
+	.modal-input {
+		@apply border border-transparent rounded-5 shadow-sm;
+	}
+
 	.modal-input-spacing {
 		@apply px-8 pt-8;
 	}
@@ -30,5 +34,10 @@
 
 	.review-no-errors {
 		@apply bg-input-gray placeholder-placeholder-gray border border-transparent rounded-5 shadow-sm;
+	}
+
+	/* divs */
+	.confirm-div {
+		@apply flex mt-6;
 	}
 }
