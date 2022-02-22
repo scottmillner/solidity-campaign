@@ -118,7 +118,7 @@ export const CreateForm: React.FC<CreateFormProps> = ({ web3, cloneFactoryContra
 						className='btn-standard h-16 w-full pt-0 text-2xl text-center'
 						onClick={handleSubmit((data) => createTransactionAsync(data))}
 					>
-						{contentState === ContentState.Review ? 'Create' : 'Confirm'}
+						{contentState === ContentState.Review ? 'Create Campaign' : 'Confirm'}
 					</button>
 				</div>
 			) : null}
