@@ -8,7 +8,7 @@ import { Ethereum, EthereumError } from './types';
 import CloneFactory from './ethereum/contracts/build/CloneFactory.json';
 
 const ethereum = window.ethereum as Ethereum;
-const cloneFactoryAddress = '0xB5a8Bb917c3143b10932468E86c94a1a072d55A2';
+const cloneFactoryAddress = '0xf46901344B3549Bd6aCb67e7801d25745F4426C7';
 
 type SetAlertOpen = React.Dispatch<React.SetStateAction<boolean>>;
 interface Web3Result {

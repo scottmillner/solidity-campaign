@@ -65,11 +65,21 @@ export const Main: React.FC = () => {
 	const createCampaignAsync: (address: string) => Promise<Campaign | null> = async (address) => {
 		if (web3) {
 			const campaignContract = new web3.eth.Contract(CampaignContract.abi as AbiItem[], address);
-			const minimumContribution = await campaignContract.methods.minimumContribution().call();
+			const {
+				0: minimumContribution,
+				1: balance,
+				2: requestsCount,
+				3: approversCount,
+				4: manager,
+			} = await campaignContract.methods.getSummary().call();
 
 			return {
 				address,
 				minimumContribution,
+				balance,
+				requestsCount,
+				approversCount,
+				manager,
 			};
 		}
 
