@@ -14,6 +14,7 @@ export enum AlertMessage {
 
 export enum PathName {
 	Home = '/',
+	Campaign = '/campaign',
 }
 export enum ContentState {
 	Create = 'CREATE',

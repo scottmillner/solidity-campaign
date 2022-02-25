@@ -12,7 +12,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Link, Route, Routes } from 'react-router-dom';
 import { Spinner } from './ui/Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHouseUser } from '@fortawesome/free-solid-svg-icons';
+import { faIgloo } from '@fortawesome/free-solid-svg-icons';
 import { Campaigns } from './Campaigns';
 import CampaignContract from '../ethereum/contracts/build/Campaign.json';
 import { AbiItem } from 'web3-utils';
@@ -20,6 +20,7 @@ import { useInterval } from './hooks/useInterval';
 import _ from 'lodash';
 import { Modal } from './ui/Modal';
 import { CreateForm } from './ui/CreateForm';
+import { SelectedCampaign } from './Campaign';
 
 interface Navigation {
 	name: string;
@@ -35,6 +36,7 @@ export const Main: React.FC = () => {
 	const [accounts, setAccounts] = useState<string[]>();
 	const [cloneFactory, setCloneFactory] = useState<Contract>();
 	const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+	const [selectedCampaign, setSelectedCampaign] = useState<string>('');
 	const [toggle, setToggle] = useState<boolean>(false);
 	const [pathName, setPathName] = useState<string>(window.location.pathname);
 	const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
@@ -44,7 +46,7 @@ export const Main: React.FC = () => {
 	const userAccount = accounts && accounts[0];
 	const isCorrectNetwork = ethereum?.networkVersion === '3';
 
-	const homeIcon = <FontAwesomeIcon icon={faHouseUser} size='2x' color='#11B4BF' />;
+	const homeIcon = <FontAwesomeIcon icon={faIgloo} size='2x' color='#11B4BF' />;
 	const navigation: Navigation[] = [{ name: 'Home', to: PathName.Home, icon: homeIcon, current: pathName === PathName.Home }];
 
 	const onboarding = new MetaMaskOnboarding();
@@ -142,10 +144,12 @@ export const Main: React.FC = () => {
 		</button>
 	);
 
+	const campaign = campaigns.filter((campaign) => campaign.address === selectedCampaign)[0];
 	const routes = (
 		<Suspense fallback={<Spinner />}>
 			<Routes>
-				<Route path={PathName.Home} element={<Campaigns campaigns={campaigns} />} />
+				<Route path={PathName.Home} element={<Campaigns campaigns={campaigns} setSelectedCampaign={setSelectedCampaign} />} />
+				<Route path={`${PathName.Campaign}/*`} element={<SelectedCampaign campaign={campaign} />} />
 			</Routes>
 		</Suspense>
 	);
@@ -231,14 +235,14 @@ export const Main: React.FC = () => {
 											key={item.name}
 											to={item.to}
 											className={classNames(
-												item.current ? 'text-lumerin-aqua' : 'text-gray-500',
+												item.current ? 'text-aqua' : 'text-gray-500',
 												'flex items-center px-2 py-2 text-md font-medium rounded-md'
 											)}
 											onClick={() => setToggle(!toggle)}
 										>
 											<div className='flex items-baseline gap-2'>
 												<div>{item.icon}</div>
-												<span>{item.name}</span>
+												<span className='text-aqua'>{item.name}</span>
 											</div>
 										</Link>
 									))}
@@ -262,14 +266,14 @@ export const Main: React.FC = () => {
 										key={item.name}
 										to={item.to}
 										className={classNames(
-											item.current ? 'text-lumerin-aqua' : 'text-lumerin-dark-aqua',
+											item.current ? 'text-aqua' : 'text-gray-500',
 											'flex items-center px-2 py-2 text-md font-medium rounded-md'
 										)}
 										onClick={() => setToggle(!toggle)}
 									>
 										<div className='flex items-baseline gap-2'>
 											<div>{item.icon}</div>
-											<span>{item.name}</span>
+											<span className='text-aqua'>{item.name}</span>
 										</div>
 									</Link>
 								))}
@@ -293,7 +297,7 @@ export const Main: React.FC = () => {
 						<MenuAlt2Icon className='h-6 w-6' aria-hidden='true' />
 					</button>
 					<div className={!isConnected ? 'hidden' : 'flex items-center ml-4 lg:ml-0'}>
-						<p className='text-lg text-lumerin-dark-aqua font-semibold'>{getPageTitle()}</p>
+						<p className='text-lg text-dark-aqua font-semibold'>{getPageTitle()}</p>
 					</div>
 					<div className={isConnected ? 'flex-1 pr-4' : 'hidden'}>
 						{isConnected ? (
