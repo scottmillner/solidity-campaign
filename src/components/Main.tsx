@@ -1,12 +1,12 @@
 import { Fragment, Suspense, useEffect, useState } from 'react';
-import { MetaMaskIcon } from '../images/index';
+import { MetaMaskIcon, WalletConnectIcon } from '../images/index';
 import MetaMaskOnboarding from '@metamask/onboarding';
-import { getWeb3ResultAsync, reconnectWalletAsync } from '../web3';
+import { getWeb3ResultAsync } from '../web3';
 import { Contract } from 'web3-eth-contract';
 import { MenuAlt2Icon, XIcon } from '@heroicons/react/outline';
 import Web3 from 'web3';
 import { classNames, printError, truncateAddress } from '../utils';
-import { AddressLength, AlertMessage, Campaign, Ethereum, PathName } from '../types';
+import { AddressLength, AlertMessage, Campaign, ConnectText, Ethereum, PathName } from '../types';
 import { Alert } from './ui/Alert';
 import { Dialog, Transition } from '@headlessui/react';
 import { Link, Route, Routes } from 'react-router-dom';
@@ -17,10 +17,11 @@ import { Campaigns } from './Campaigns';
 import CampaignContract from '../ethereum/contracts/build/Campaign.json';
 import { AbiItem } from 'web3-utils';
 import { useInterval } from './hooks/useInterval';
-import _ from 'lodash';
 import { Modal } from './ui/Modal';
 import { CreateForm } from './ui/CreateForm';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 import { SelectedCampaign } from './Campaign';
+import _ from 'lodash';
 
 interface Navigation {
 	name: string;
@@ -40,25 +41,49 @@ export const Main: React.FC = () => {
 	const [toggle, setToggle] = useState<boolean>(false);
 	const [pathName, setPathName] = useState<string>(window.location.pathname);
 	const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
+	const [isMetaMask, setIsMetaMask] = useState<boolean>(false);
 	const [web3, setWeb3] = useState<Web3>();
+	const [chainId, setChainId] = useState<number>(0);
 
 	const ethereum = window.ethereum as Ethereum;
 	const userAccount = accounts && accounts[0];
-	const isCorrectNetwork = ethereum?.networkVersion === '3';
+	const isCorrectNetwork = chainId === 3;
 
 	const homeIcon = <FontAwesomeIcon icon={faIgloo} size='2x' color='#11B4BF' />;
 	const navigation: Navigation[] = [{ name: 'Home', to: PathName.Home, icon: homeIcon, current: pathName === PathName.Home }];
 
+	const disconnectWalletConnectAsync: () => void = async () => {
+		if (!isMetaMask) {
+			await (web3?.currentProvider as unknown as WalletConnectProvider).disconnect();
+			setIsConnected(false);
+		}
+	};
+
 	const onboarding = new MetaMaskOnboarding();
-	const connectWallet: () => void = async () => {
-		const web3Result = await getWeb3ResultAsync(setAlertOpen);
+	const onboardMetaMask: () => void = () => {
+		// Onboard metamask if not installed
+		if (!MetaMaskOnboarding.isMetaMaskInstalled()) {
+			onboarding.startOnboarding();
+		} else {
+			onboarding.stopOnboarding();
+		}
+	};
+	const connectWallet: (walletName: string) => void = async (walletName) => {
+		if (walletName === ConnectText.ConnectViaMetaMask) onboardMetaMask();
+		const web3Result = await getWeb3ResultAsync(walletName, setAlertOpen);
 		if (web3Result) {
-			if (ethereum.networkVersion !== '3') setAlertOpen(true);
 			const { accounts, contractInstance, web3 } = web3Result;
+			const chainId = await web3.eth.net.getId();
+			if (chainId !== 3) {
+				setAlertOpen(true);
+				disconnectWalletConnectAsync();
+			}
 			setAccounts(accounts);
 			setCloneFactory(contractInstance);
 			setWeb3(web3);
 			setIsConnected(true);
+			setChainId(chainId);
+			if (walletName === ConnectText.ConnectViaMetaMask) setIsMetaMask(true);
 		}
 	};
 
@@ -109,29 +134,13 @@ export const Main: React.FC = () => {
 	};
 
 	useEffect(() => {
-		if (isCorrectNetwork) createCampaignsAsync();
+		createCampaignsAsync();
 	}, [cloneFactory, accounts, web3]);
 
 	// Get campaigns every 30 seconds
 	useInterval(() => {
 		createCampaignsAsync();
 	}, 30000);
-
-	const connectClickHander: React.MouseEventHandler<HTMLButtonElement> = async (event) => {
-		// Onboard metamask if not installed
-		if (!MetaMaskOnboarding.isMetaMaskInstalled()) {
-			onboarding.startOnboarding();
-		} else {
-			onboarding.stopOnboarding();
-		}
-
-		if (!isConnected) {
-			connectWallet();
-		} else {
-			reconnectWalletAsync();
-			setIsConnected(false);
-		}
-	};
 
 	const getTruncatedWalletAddress: () => string | null = () => {
 		if (userAccount) {
@@ -147,11 +156,26 @@ export const Main: React.FC = () => {
 	};
 
 	// Content setup
-	const ActionButton: JSX.Element = (
-		<button type='button' className='btn-wallet w-60 h-12 bg-aqua text-sm font-Inter' onClick={connectClickHander}>
-			<span className='mr-4'>Connect Via MetaMask</span>
-			<MetaMaskIcon />
-		</button>
+	const ActionButtons: JSX.Element = (
+		<div className='flex flex-col items-center mt-4 font-medium'>
+			<div className='text-aqua'>Connect Your Wallet</div>
+			<button
+				type='button'
+				className='btn-wallet w-60 h-12 mt-4 bg-aqua text-sm font-Inter'
+				onClick={() => connectWallet(ConnectText.ConnectViaMetaMask)}
+			>
+				<span className='mr-4'>{ConnectText.ConnectViaMetaMask}</span>
+				<MetaMaskIcon />
+			</button>
+			<button
+				type='button'
+				className='btn-wallet w-60 h-12 mt-4 bg-aqua text-sm font-Inter'
+				onClick={() => connectWallet(ConnectText.ConnectViaWalletConnect)}
+			>
+				<span className='mr-4'>{ConnectText.ConnectViaWalletConnect}</span>
+				<WalletConnectIcon />
+			</button>
+		</div>
 	);
 
 	const campaign = campaigns.filter((campaign) => campaign.address === selectedCampaign)[0];
@@ -165,30 +189,31 @@ export const Main: React.FC = () => {
 	);
 
 	const getContent: () => JSX.Element | undefined = () => {
-		if (!isConnected) return ActionButton;
+		if (!isConnected) return ActionButtons;
 		if (!isCorrectNetwork) return;
 		return routes;
 	};
 
 	const getAlertMessage: () => string = () => {
-		if (!isCorrectNetwork) return AlertMessage.WrongNetwork;
-		if (!isConnected) return AlertMessage.NotConnected;
-		return AlertMessage.NotConnected;
+		if (isCorrectNetwork && !isConnected) return AlertMessage.NotConnected;
+		return isMetaMask ? AlertMessage.WrongNetworkMetaMask : AlertMessage.WrongNetworkWalletConnect;
 	};
 
 	const changeNetworkAsync: () => void = async () => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const result = await ethereum.request({
-			method: 'wallet_switchEthereumChain',
-			params: [{ chainId: web3?.utils.toHex(3) }],
-		});
-		setAlertOpen(false);
-		connectWallet();
+		if (isMetaMask) {
+			await ethereum.request({
+				method: 'wallet_switchEthereumChain',
+				params: [{ chainId: web3?.utils.toHex(3) }],
+			});
+			connectWallet(ConnectText.ConnectViaMetaMask);
+			setAlertOpen(false);
+		}
 	};
 
 	return (
 		<div id='main' className='h-screen flex overflow-hidden font-Inter'>
-			<Alert message={getAlertMessage()} open={alertOpen} setOpen={setAlertOpen} onClick={changeNetworkAsync} />
+			<Alert message={getAlertMessage()} open={alertOpen} setOpen={setAlertOpen} onClick={isMetaMask ? changeNetworkAsync : () => {}} />
 			<Modal
 				open={createModalOpen}
 				setOpen={setCreateModalOpen}
@@ -315,10 +340,20 @@ export const Main: React.FC = () => {
 								<button className='btn-create' onClick={() => setCreateModalOpen(true)}>
 									Create Campaign
 								</button>
-								<button className='btn-connected w-64 cursor-default'>
-									<span className='mr-4'>{getTruncatedWalletAddress()}</span>
-									<MetaMaskIcon />
-								</button>
+								<div className='flex'>
+									<button className='btn-connected w-64 cursor-default'>
+										<span className='mr-4'>{getTruncatedWalletAddress()}</span>
+										{isMetaMask ? <MetaMaskIcon /> : <WalletConnectIcon />}
+									</button>
+									{!isMetaMask ? (
+										<button
+											className='btn-connected w-auto p-0 ml-4 bg-white text-aqua font-semibold'
+											onClick={() => disconnectWalletConnectAsync()}
+										>
+											<span>Disconnect</span>
+										</button>
+									) : null}
+								</div>
 							</div>
 						) : null}
 					</div>

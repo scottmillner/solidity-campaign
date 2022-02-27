@@ -8,8 +8,9 @@ export enum AddressLength {
 }
 
 export enum AlertMessage {
-	NotConnected = 'MetaMask is not connected',
-	WrongNetwork = 'Please connect to the Ropsten testnet.',
+	NotConnected = 'Your wallet is not connected',
+	WrongNetworkMetaMask = 'Click to connect MetaMask to the Ropsten testnet.',
+	WrongNetworkWalletConnect = 'Please connect your wallet to the Ropsten testnet.',
 }
 
 export enum PathName {
@@ -22,6 +23,12 @@ export enum ContentState {
 	Confirm = 'CONFIRM',
 	Pending = 'PENDING',
 	Complete = 'COMPLETE',
+}
+
+export enum ConnectText {
+	ConnectViaMetaMask = 'MetaMask',
+	ConnectViaWalletConnect = 'WalletConnect',
+	Disconnect = 'Disconnect',
 }
 
 // Interfaces

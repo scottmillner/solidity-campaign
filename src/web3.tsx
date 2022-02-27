@@ -4,7 +4,8 @@ import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import { provider } from 'web3-core/types/index';
 import { printError } from './utils';
-import { Ethereum, EthereumError } from './types';
+import { ConnectText, Ethereum, EthereumError } from './types';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 import CloneFactory from './ethereum/contracts/build/CloneFactory.json';
 
 const ethereum = window.ethereum as Ethereum;
@@ -17,13 +18,38 @@ interface Web3Result {
 	web3: Web3;
 }
 
-export const getWeb3ResultAsync: (setAlertOpen: SetAlertOpen) => Promise<Web3Result | null> = async (setAlertOpen: SetAlertOpen) => {
-	const provider = (await detectEthereumProvider()) as provider;
-	if (provider && provider === ethereum) {
+const getProviderAsync: (walletName: string) => Promise<provider | WalletConnectProvider> = async (walletName) => {
+	switch (walletName) {
+		case ConnectText.ConnectViaMetaMask:
+			return (await detectEthereumProvider()) as provider;
+		default:
+			return new WalletConnectProvider({
+				rpc: {
+					1: 'https://eth.connect.bloq.cloud/v1/stable-relax-science',
+					3: 'https://ropsten.connect.bloq.cloud/v1/stable-relax-science',
+				},
+				chainId: 3,
+				clientMeta: {
+					description: 'Welcome to the Lumerin Token Distribution site. Claim your LMR tokens here.',
+					url: 'https://token.sbx.lumerin.io',
+					icons: [''],
+					name: 'Lumerin Token Distribution',
+				},
+			});
+	}
+};
+
+export const getWeb3ResultAsync: (walletName: string, setAlertOpen: SetAlertOpen) => Promise<Web3Result | null> = async (
+	walletName,
+	setAlertOpen
+) => {
+	const provider = await getProviderAsync(walletName);
+	if (provider) {
 		try {
 			// Expose accounts
-			await ethereum.request({ method: 'eth_requestAccounts' });
-			const web3 = new Web3(provider);
+			if (walletName === ConnectText.ConnectViaMetaMask) await ethereum.request({ method: 'eth_requestAccounts' });
+			else await (provider as WalletConnectProvider).enable();
+			const web3 = new Web3(provider as provider);
 			const accounts = await web3.eth.getAccounts();
 			if (accounts.length === 0 || accounts[0] === '') {
 				setAlertOpen(true);
