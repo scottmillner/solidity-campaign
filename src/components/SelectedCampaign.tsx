@@ -26,6 +26,7 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 	const {
 		register,
 		handleSubmit,
+		reset,
 		formState: { errors, isValid },
 	} = useForm<FormData>({ mode: 'onBlur' });
 
@@ -51,6 +52,7 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 				}
 			} catch (error) {
 				setOpen(false);
+				reset({ contribution: campaign.minimumContribution });
 			}
 		}
 	};
@@ -89,8 +91,10 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 	);
 
 	// Create transaction when in pending state
+	// Reset form when transaction complete or rejected
 	useEffect(() => {
 		if (contentState === ContentState.Pending) createTransactionAsync(formData);
+		if (contentState === ContentState.Complete) reset({ contribution: campaign.minimumContribution });
 	}, [contentState]);
 
 	return (
@@ -134,7 +138,12 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 						<p className='mt-4 p-text'>The number of people who have already donated to this campaign.</p>
 					</div>
 					<div className='card'>
-						<div>{campaign.balance} WEI</div>
+						<div>
+							{parseFloat(web3?.utils.fromWei(campaign.balance.toString(), 'ether') as string).toLocaleString('en-US', {
+								maximumFractionDigits: 18,
+							})}{' '}
+							ETH
+						</div>
 						<div className='item-text'>Campaign balance</div>
 						<p className='mt-4 p-text'>The balance is how much money this campaign has left to spend.</p>
 					</div>
