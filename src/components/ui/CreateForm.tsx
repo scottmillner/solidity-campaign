@@ -4,16 +4,14 @@ import { CloseModalIcon } from './CloseModalIcon';
 import { useForm } from 'react-hook-form';
 import { Spinner } from './Spinner';
 import { Contract } from 'web3-eth-contract';
-import Web3 from 'web3';
 import { classNames } from '../../utils';
 
 interface CreateFormProps {
-	web3: Web3 | undefined;
 	cloneFactoryContract: Contract | undefined;
 	userAccount: string | undefined;
 	setOpen: Dispatch<SetStateAction<boolean>>;
 }
-export const CreateForm: React.FC<CreateFormProps> = ({ web3, cloneFactoryContract, userAccount, setOpen }) => {
+export const CreateForm: React.FC<CreateFormProps> = ({ cloneFactoryContract, userAccount, setOpen }) => {
 	const [contentState, setContentState] = useState<string>(ContentState.Review);
 	const [formData, setFormData] = useState<FormData>({ minimumContribution: 1 });
 
@@ -41,12 +39,10 @@ export const CreateForm: React.FC<CreateFormProps> = ({ web3, cloneFactoryContra
 		// Pending
 		if (isValid && contentState === ContentState.Pending) {
 			try {
-				if (web3) {
-					const receipt: Receipt = await cloneFactoryContract?.methods
-						.createCampaign(formData.minimumContribution, userAccount as string)
-						.send({ from: userAccount });
-					if (receipt?.status) setContentState(ContentState.Complete);
-				}
+				const receipt: Receipt = await cloneFactoryContract?.methods
+					.createCampaign(formData.minimumContribution, userAccount as string)
+					.send({ from: userAccount });
+				if (receipt?.status) setContentState(ContentState.Complete);
 			} catch (error) {
 				setOpen(false);
 			}

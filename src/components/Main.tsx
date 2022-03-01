@@ -20,7 +20,7 @@ import { useInterval } from './hooks/useInterval';
 import { Modal } from './ui/Modal';
 import { CreateForm } from './ui/CreateForm';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import { SelectedCampaign } from './Campaign';
+import { SelectedCampaign } from './SelectedCampaign';
 import _ from 'lodash';
 
 interface Navigation {
@@ -41,6 +41,7 @@ export const Main: React.FC = () => {
 	const [toggle, setToggle] = useState<boolean>(false);
 	const [pathName, setPathName] = useState<string>(window.location.pathname);
 	const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
+	const [contributeModalOpen, setContributeModalOpen] = useState<boolean>(false);
 	const [isMetaMask, setIsMetaMask] = useState<boolean>(false);
 	const [web3, setWeb3] = useState<Web3>();
 	const [chainId, setChainId] = useState<number>(0);
@@ -183,7 +184,7 @@ export const Main: React.FC = () => {
 		<Suspense fallback={<Spinner />}>
 			<Routes>
 				<Route path={PathName.Home} element={<Campaigns campaigns={campaigns} setSelectedCampaign={setSelectedCampaign} />} />
-				<Route path={`${PathName.Campaign}/*`} element={<SelectedCampaign campaign={campaign} />} />
+				<Route path={`${PathName.Campaign}/*`} element={<SelectedCampaign web3={web3} userAccount={userAccount} campaign={campaign} />} />
 			</Routes>
 		</Suspense>
 	);
@@ -217,7 +218,7 @@ export const Main: React.FC = () => {
 			<Modal
 				open={createModalOpen}
 				setOpen={setCreateModalOpen}
-				content={<CreateForm web3={web3} cloneFactoryContract={cloneFactory} userAccount={userAccount} setOpen={setCreateModalOpen} />}
+				content={<CreateForm cloneFactoryContract={cloneFactory} userAccount={userAccount} setOpen={setCreateModalOpen} />}
 			/>
 			{/* collapsable sidebar: below lg breakpoint */}
 			<Transition.Root show={sidebarOpen} as={Fragment}>
@@ -371,7 +372,7 @@ export const Main: React.FC = () => {
 				</div> */}
 				<main
 					className={classNames(
-						isConnected ? 'mt-8 mr-0 lg:mr-48' : 'm-auto',
+						isConnected ? 'mt-8 mr-0' : 'm-auto',
 						'flex justify-center lg:justify-start relative overflow-y-auto focus:outline-none'
 					)}
 				>
