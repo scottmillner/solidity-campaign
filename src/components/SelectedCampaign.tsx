@@ -53,13 +53,14 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 			} catch (error) {
 				setOpen(false);
 				reset({ contribution: campaign.minimumContribution });
+				setContentState(ContentState.Review);
 			}
 		}
 	};
 
 	const ContributeForm = (
-		<div className='bg-white text-black px-6 py-8 md:px-16 border-transparent rounded-5'>
-			<CloseModalIcon setOpen={setOpen} />
+		<div className={contentState === ContentState.Review ? 'hidden' : 'bg-white text-black px-6 py-8 md:px-16 border-transparent rounded-5'}>
+			<CloseModalIcon setOpen={setOpen} onCloseHandler={() => setContentState(ContentState.Review)} />
 			{contentState === ContentState.Confirm ? (
 				<div className='flex flex-col w-full items-center mb-4'>
 					<p className='text-slate-800 text-xl'>Review the contribution amount and confirm.</p>
@@ -77,7 +78,7 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 					{contentState === ContentState.Pending ? <Spinner /> : null}
 				</div>
 			) : null}
-			{contentState === ContentState.Review || contentState === ContentState.Confirm ? (
+			{contentState === ContentState.Confirm ? (
 				<div className='flex justify-center items-center'>
 					<button
 						className='btn-standard h-16 w-full pt-0 text-2xl text-center'
@@ -94,12 +95,12 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 	// Reset form when transaction complete or rejected
 	useEffect(() => {
 		if (contentState === ContentState.Pending) createTransactionAsync(formData);
-		if (contentState === ContentState.Complete) reset({ contribution: campaign.minimumContribution });
+		if (contentState === ContentState.Review || contentState === ContentState.Complete) reset({ contribution: campaign.minimumContribution });
 	}, [contentState]);
 
 	return (
 		<div className='px-4'>
-			<Modal open={open} setOpen={setOpen} content={ContributeForm} />
+			<Modal open={open} setOpen={setOpen} content={ContributeForm} onCloseHandler={() => setContentState(ContentState.Review)} />
 			<div className='flex flex-col'>
 				<div className='flex flex-col xl:flex-row xl:flex-wrap gap-4 xl:px-0'>
 					<div className='card'>
@@ -158,7 +159,7 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 								required: 'Contribution amount is required.',
 								valueAsNumber: true,
 								validate: (value) => {
-									if (value || value === 0) return Number.isInteger(value) && value > campaign.minimumContribution;
+									if (value || value === 0) return Number.isInteger(value) && value >= campaign.minimumContribution;
 								},
 							})}
 							id='contribution'

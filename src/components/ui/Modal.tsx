@@ -5,12 +5,25 @@ interface ModalProps {
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	content: JSX.Element;
+	onCloseHandler?: () => void;
 }
 
-export const Modal: React.FC<ModalProps> = ({ open, setOpen, content }) => {
+export const Modal: React.FC<ModalProps> = ({ open, setOpen, content, onCloseHandler }) => {
 	return (
 		<Transition.Root show={open} as={Fragment}>
-			<Dialog as='div' auto-reopen='true' className='fixed z-10 inset-0 overflow-y-auto' onClose={setOpen}>
+			<Dialog
+				as='div'
+				auto-reopen='true'
+				className='fixed z-10 inset-0 overflow-y-auto'
+				onClose={
+					onCloseHandler
+						? () => {
+								setOpen(false);
+								onCloseHandler();
+						  }
+						: () => setOpen(false)
+				}
+			>
 				<div className='flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0'>
 					<Transition.Child
 						as={Fragment}
