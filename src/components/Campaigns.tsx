@@ -19,7 +19,7 @@ export const Campaigns: React.FC<CampaignsProps> = ({ campaigns, setSelectedCamp
 							<p className='text-xl text-slate-800'>{truncateAddress(campaign.address)}</p>
 							<Link
 								key={index}
-								to={`${PathName.Campaign}/${campaign.address}`}
+								to={`${PathName.Campaign}/${campaign.address.toLowerCase()}`}
 								onClick={() => setSelectedCampaign(campaign.address)}
 								className='text-lg text-white font-medium'
 							>

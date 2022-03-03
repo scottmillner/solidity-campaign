@@ -1,4 +1,4 @@
-import { Campaign, ContentState, Receipt } from '../types';
+import { Campaign, ContentState, PathName, Receipt } from '../types';
 import { classNames, truncateAddress } from '../utils';
 import { useForm } from 'react-hook-form';
 import { Modal } from './ui/Modal';
@@ -8,6 +8,7 @@ import CampaignContract from '../ethereum/contracts/build/Campaign.json';
 import { AbiItem } from 'web3-utils';
 import { CloseModalIcon } from './ui/CloseModalIcon';
 import { Spinner } from './ui/Spinner';
+import { Link } from 'react-router-dom';
 
 interface CampaignProps {
 	web3: Web3 | undefined;
@@ -99,7 +100,7 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 	}, [contentState]);
 
 	return (
-		<div className='px-4'>
+		<div className='px-4 md:px-0'>
 			<Modal open={open} setOpen={setOpen} content={ContributeForm} onCloseHandler={() => setContentState(ContentState.Review)} />
 			<div className='flex flex-col'>
 				<div className='flex flex-col xl:flex-row xl:flex-wrap gap-4 xl:px-0'>
@@ -149,48 +150,58 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 						<p className='mt-4 p-text'>The balance is how much money this campaign has left to spend.</p>
 					</div>
 				</div>
-				<div className='flex flex-col gap-1 w-full sm:w-1/2 xl:w-1/4 mt-8 text-black'>
-					<label htmlFor='contribution' className='block mb-1 text-lg font-medium text-gray-700'>
-						Contribution Amount
-					</label>
-					<div className='flex'>
-						<input
-							{...register('contribution', {
-								required: 'Contribution amount is required.',
-								valueAsNumber: true,
-								validate: (value) => {
-									if (value || value === 0) return Number.isInteger(value) && value >= campaign.minimumContribution;
-								},
-							})}
-							id='contribution'
-							type='number'
-							min={campaign.minimumContribution}
-							placeholder={campaign.minimumContribution.toString()}
-							className={
-								errors.contribution
-									? 'bg-red-100 modal-input rounded-r-none  placeholder-red-400 review-input'
-									: 'review-no-errors review-input rounded-r-none'
-							}
-						/>
-						<div className='flex items-center px-2 modal-input bg-slate-500 text-white rounded-l-none'>WEI</div>
-					</div>
-
-					{errors.contribution?.type === 'required' && <div className='text-xs text-red-500'>{errors.contribution.message}</div>}
-					{errors.contribution?.type === 'validate' && (
-						<div className='text-xs text-red-500'>
-							Contribution amount must be a whole number greater than {campaign.minimumContribution.toString()}
+				<div className='flex flex-col sm:flex-row gap-1 w-full mt-8 text-black'>
+					<div className='flex flex-col'>
+						<label htmlFor='contribution' className='block mb-1 text-lg font-medium text-gray-700'>
+							Contribution Amount
+						</label>
+						<div className='flex'>
+							<input
+								{...register('contribution', {
+									required: 'Contribution amount is required.',
+									valueAsNumber: true,
+									validate: (value) => {
+										if (value || value === 0) return Number.isInteger(value) && value >= campaign.minimumContribution;
+									},
+								})}
+								id='contribution'
+								type='number'
+								min={campaign.minimumContribution}
+								placeholder={campaign.minimumContribution.toString()}
+								className={
+									errors.contribution
+										? 'bg-red-100 modal-input rounded-r-none  placeholder-red-400 review-input'
+										: 'review-no-errors review-input rounded-r-none'
+								}
+							/>
+							<div className='flex items-center px-2 modal-input bg-slate-500 text-white rounded-l-none'>WEI</div>
 						</div>
-					)}
-					<div className='flex justify-center items-center'>
-						<button
-							className='btn-standard h-16 w-full pt-0 text-2xl text-center'
-							onClick={handleSubmit((data) => {
-								createTransactionAsync(data);
-								setOpen(true);
-							})}
+
+						{errors.contribution?.type === 'required' && <div className='text-xs text-red-500'>{errors.contribution.message}</div>}
+						{errors.contribution?.type === 'validate' && (
+							<div className='text-xs text-red-500'>
+								Contribution amount must be a whole number greater than {campaign.minimumContribution.toString()}
+							</div>
+						)}
+						<div className='flex justify-center items-center'>
+							<button
+								className='btn-standard h-16 w-full pt-0 text-2xl text-center'
+								onClick={handleSubmit((data) => {
+									createTransactionAsync(data);
+									setOpen(true);
+								})}
+							>
+								Contribute!!
+							</button>
+						</div>
+					</div>
+					<div className='flex items-end sm:pl-4'>
+						<Link
+							className='btn-standard h-16 w-full flex items-center bg-black pt-0 text-2xl text-center'
+							to={`${PathName.Campaign}/${campaign.address.toLowerCase()}/requests`}
 						>
-							Contribute!!
-						</button>
+							View Requests
+						</Link>
 					</div>
 				</div>
 			</div>

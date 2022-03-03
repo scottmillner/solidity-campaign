@@ -184,7 +184,14 @@ export const Main: React.FC = () => {
 		<Suspense fallback={<Spinner />}>
 			<Routes>
 				<Route path={PathName.Home} element={<Campaigns campaigns={campaigns} setSelectedCampaign={setSelectedCampaign} />} />
-				<Route path={`${PathName.Campaign}/*`} element={<SelectedCampaign web3={web3} userAccount={userAccount} campaign={campaign} />} />
+				<Route
+					path={`${PathName.Campaign}/${campaign?.address.toLowerCase()}`}
+					element={<SelectedCampaign web3={web3} userAccount={userAccount} campaign={campaign} />}
+				/>
+				<Route
+					path={`${PathName.Campaign}/${campaign?.address.toLowerCase()}/requests`}
+					element={<SelectedCampaign web3={web3} userAccount={userAccount} campaign={campaign} />}
+				/>
 			</Routes>
 		</Suspense>
 	);
