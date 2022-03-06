@@ -197,7 +197,7 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 					</div>
 					<div className='flex items-end sm:pl-4'>
 						<Link
-							className='btn-standard h-16 w-full flex items-center bg-black pt-0 text-2xl text-center'
+							className='btn-standard h-16 w-full flex justify-center items-center bg-black pt-0 text-2xl'
 							to={`${PathName.Campaign}/${campaign.address.toLowerCase()}/requests`}
 						>
 							View Requests

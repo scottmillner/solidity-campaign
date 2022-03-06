@@ -41,6 +41,7 @@
 		"react-router": "^6.2.1",
 		"react-router-dom": "^6.2.1",
 		"react-scripts": "5.0.0",
+		"react-table": "^7.7.0",
 		"solc": "^0.8.11",
 		"stream-browserify": "^3.0.0",
 		"stream-http": "^3.2.0",
@@ -76,6 +77,7 @@
 	},
 	"devDependencies": {
 		"@types/lodash": "^4.14.178",
+		"@types/react-table": "^7.7.9",
 		"autoprefixer": "^10.4.2",
 		"postcss": "^8.4.5",
 		"tailwindcss": "^3.0.15"

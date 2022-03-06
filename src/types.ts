@@ -42,6 +42,13 @@ export interface EthereumError extends Error {
 	code: number;
 }
 
+export interface Request {
+	description?: string;
+	amount?: number;
+	recipient?: string;
+	approvalCount?: number;
+}
+
 export interface Campaign {
 	address: string;
 	minimumContribution: number;

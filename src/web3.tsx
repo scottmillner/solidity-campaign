@@ -9,7 +9,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import CloneFactory from './ethereum/contracts/build/CloneFactory.json';
 
 const ethereum = window.ethereum as Ethereum;
-const cloneFactoryAddress = '0xf46901344B3549Bd6aCb67e7801d25745F4426C7';
+const cloneFactoryAddress = '0x9CE78F08Efb453CD2c9Cee959859b04c151e9F12';
 
 type SetAlertOpen = React.Dispatch<React.SetStateAction<boolean>>;
 interface Web3Result {

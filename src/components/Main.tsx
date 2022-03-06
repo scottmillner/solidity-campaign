@@ -22,6 +22,7 @@ import { CreateForm } from './ui/CreateForm';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { SelectedCampaign } from './SelectedCampaign';
 import _ from 'lodash';
+import { Requests } from './Requests';
 
 interface Navigation {
 	name: string;
@@ -41,7 +42,6 @@ export const Main: React.FC = () => {
 	const [toggle, setToggle] = useState<boolean>(false);
 	const [pathName, setPathName] = useState<string>(window.location.pathname);
 	const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
-	const [contributeModalOpen, setContributeModalOpen] = useState<boolean>(false);
 	const [isMetaMask, setIsMetaMask] = useState<boolean>(false);
 	const [web3, setWeb3] = useState<Web3>();
 	const [chainId, setChainId] = useState<number>(0);
@@ -130,7 +130,6 @@ export const Main: React.FC = () => {
 		} catch (error) {
 			const typedError = error as Error;
 			printError(typedError.message, typedError.stack as string);
-			throw typedError;
 		}
 	};
 
@@ -190,7 +189,7 @@ export const Main: React.FC = () => {
 				/>
 				<Route
 					path={`${PathName.Campaign}/${campaign?.address.toLowerCase()}/requests`}
-					element={<SelectedCampaign web3={web3} userAccount={userAccount} campaign={campaign} />}
+					element={<Requests campaign={campaign} web3={web3} />}
 				/>
 			</Routes>
 		</Suspense>
