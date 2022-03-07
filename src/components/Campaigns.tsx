@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { Link } from 'react-router-dom';
 import { Campaign, PathName } from '../types';
 import { truncateAddress } from '../utils';
+import { Spinner } from './ui/Spinner';
 
 interface CampaignsProps {
 	campaigns: Campaign[];
@@ -9,7 +10,7 @@ interface CampaignsProps {
 }
 
 export const Campaigns: React.FC<CampaignsProps> = ({ campaigns, setSelectedCampaign }) => {
-	return (
+	return campaigns.length > 1 ? (
 		<div className='flex flex-col gap-4 mx-4 lg:ml-0'>
 			<p className='text-3xl font-medium'>Open Campaigns</p>
 			<div className='flex flex-col flex-wrap sm:flex-row gap-6'>
@@ -30,6 +31,8 @@ export const Campaigns: React.FC<CampaignsProps> = ({ campaigns, setSelectedCamp
 				})}
 			</div>
 		</div>
+	) : (
+		<Spinner />
 	);
 };
 

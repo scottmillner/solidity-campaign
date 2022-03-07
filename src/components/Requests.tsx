@@ -6,7 +6,6 @@ import { Table } from './Table';
 import CampaignContract from '../ethereum/contracts/build/Campaign.json';
 import { AbiItem } from 'web3-utils';
 import { printError } from '../utils';
-import { Spinner } from './ui/Spinner';
 
 interface RequestsProps {
 	campaign: Campaign;
@@ -19,9 +18,11 @@ export const Requests: React.FC<RequestsProps> = ({ campaign, web3 }) => {
 	const columns: Column<Request>[] = useMemo(
 		() => [
 			{ Header: 'Description', accessor: 'description' },
-			{ Header: 'Amount', accessor: 'amount' },
+			{ Header: 'Amount', accessor: 'value' },
 			{ Header: 'Recipient', accessor: 'recipient' },
 			{ Header: 'Approval Count', accessor: 'approvalCount' },
+			{ Header: 'Approve', accessor: 'approve' },
+			{ Header: 'Finalize', accessor: 'finalize' },
 		],
 		[]
 	);
@@ -53,7 +54,9 @@ export const Requests: React.FC<RequestsProps> = ({ campaign, web3 }) => {
 		getRequestsAsync();
 	}, [campaign]);
 
-	return <div>{requests.length === 0 ? <Spinner /> : <Table tableInstance={tableInstance} />}</div>;
+	return (
+		<div className='w-full pr-4'>{requests.length === 0 ? <p className='text-2xl'>No Requests</p> : <Table tableInstance={tableInstance} />}</div>
+	);
 };
 
 Requests.displayName = 'Requests';
