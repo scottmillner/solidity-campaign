@@ -185,7 +185,7 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 						)}
 						<div className='flex justify-center items-center'>
 							<button
-								className='btn-standard h-16 w-full pt-0 text-2xl text-center'
+								className='btn-standard h-16 w-full pt-0 text-xl text-center'
 								onClick={handleSubmit((data) => {
 									createTransactionAsync(data);
 									setOpen(true);
@@ -197,7 +197,7 @@ export const SelectedCampaign: React.FC<CampaignProps> = ({ web3, userAccount, c
 					</div>
 					<div className='flex items-end sm:pl-4'>
 						<Link
-							className='btn-standard h-16 w-full flex justify-center items-center bg-black pt-0 text-2xl'
+							className='btn-standard h-16 w-full flex justify-center items-center bg-black pt-0 text-xl'
 							to={`${PathName.Campaign}/${campaign.address.toLowerCase()}/requests`}
 						>
 							View Requests

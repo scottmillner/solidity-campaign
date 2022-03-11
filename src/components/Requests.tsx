@@ -38,7 +38,9 @@ export const Requests: React.FC<RequestsProps> = ({ campaign, web3 }) => {
 				if (requestCount) {
 					const array: string[] = [];
 					for (let i = 0; i < requestCount; i++) array.push('');
-					const requests: Request[] = await Promise.all(array.map((_, index) => campaignContract.methods.requests(index).call()));
+					const requests: Request[] = await Promise.all(
+						array.map(async (_, index) => await campaignContract.methods.requests(index).call())
+					);
 					setRequests(requests);
 				} else {
 					setRequests([]);
